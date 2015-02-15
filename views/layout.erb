@@ -1,0 +1,60 @@
+<html>
+
+<head>
+  <!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="/css/bootstrap.min.css">
+<link href="/css/bootstrap-switch.min.css" rel="stylesheet">
+<link href='http://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Lobster+Two' rel='stylesheet' type='text/css'>
+<style>
+body {
+  font-family: 'Lobster Two', cursive;
+  font-size: 16px;
+  color: #7D1B7E;
+  background: url("http://p1.pichost.me/i/14/1372390.jpg");
+  background-size: cover;
+}
+h1 {
+  font-family: 'Lobster Two', cursive;
+  text-align: center;
+  font-size: 80px;
+  margin: 50px 0 50px 0;
+}
+form {
+  background: RGBA(255,192,203,0.6);
+  padding: 20px;
+  margin: 40px;
+  font-size: 17px;
+  border-radius: 15px;
+
+}
+button[type="submit"] {
+    background: #da70d6;
+    color: white;
+    border-color: white;
+    font-size: 20px;
+    border-radius: 10px;
+  }
+
+.button {
+  text-align: right;
+}
+.form-group {
+  font-family: 'Lobster Two', cursive;
+  font-size: 16px;
+}
+}
+}
+</style>
+</head>
+
+<body>
+  <%= yield %>
+  <script src="http://code.jquery.com/jquery-2.1.3.min.js"></script>
+  <script src="/js/bootstrap.min.js"></script>
+  <script src="/js/bootstrap-switch.min.js"></script>
+  <script> $(document).ready(function(){
+    $("[name='my-checkbox']").bootstrapSwitch();
+  });</script>
+</body>
+</html>

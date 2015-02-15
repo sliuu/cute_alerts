@@ -1,0 +1,9 @@
+source 'https://rubygems.org'
+ruby '2.2.0'
+gem 'sinatra'
+gem 'rerun'
+gem "sinatra-activerecord"
+gem "sqlite3"
+gem "rake"
+gem "twilio-ruby"
+gem "google-api-client"
