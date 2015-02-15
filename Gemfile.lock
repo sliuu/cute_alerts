@@ -50,6 +50,7 @@ GEM
     minitest (5.5.1)
     multi_json (1.10.1)
     multipart-post (2.0.0)
+    pg (0.18.1)
     rack (1.6.0)
     rack-protection (1.5.3)
       rack
@@ -60,6 +61,8 @@ GEM
     rerun (0.10.0)
       listen (~> 2.7, >= 2.7.3)
     retriable (1.4.1)
+    rufus-scheduler (3.0.9)
+      tzinfo
     signet (0.6.0)
       addressable (~> 2.3)
       extlib (~> 0.9)
@@ -90,8 +93,10 @@ PLATFORMS
 
 DEPENDENCIES
   google-api-client
+  pg
   rake
   rerun
+  rufus-scheduler
   sinatra
   sinatra-activerecord
   sqlite3

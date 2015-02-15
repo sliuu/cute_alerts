@@ -1,8 +1,12 @@
-require 'rubygems'
-require 'bundler'
-Bundler.require(:default)
+require 'twilio-ruby'
 require 'google/api_client'
 require 'logger'
+require 'json'
+require 'sinatra'
+require 'sinatra/activerecord'
+require './config/environments' #database configuration
+require './models/user'
+require 'rufus/scheduler'
 
 # Get your Account Sid and Auth Token from twilio.com/user/account
 #account_sid = 'AC307071b7b6333dab0e0d7a00eeb4f939'
@@ -67,6 +71,7 @@ end
 
 get '/oauth2authorize' do
   # Request authorization
+  session[:phone] = params[:phone]
   redirect user_credentials.authorization_uri.to_s, 303
 end
 
@@ -82,22 +87,81 @@ get '/results' do
   result = api_client.execute(:api_method => settings.calendar.events.list,
                               :parameters => {'calendarId' => 'primary'},
                               :authorization => user_credentials)
-  [result.status, {'Content-Type' => 'application/json'}, result.data.to_json]
+  #[result.status, {'Content-Type' => 'application/json'}, result.data.to_json]
+  json = JSON.parse(result.data.to_json)
+  json.to_s
+  #"#{json[:items][0][:summary]} : #{json[:items][0][:creator][:displayName]} : #{json[:items][0][:start][:dateTime]}"
+  output = ""
+  json["items"].each do |j|
+
+    u = User.where(name: j["creator"]["displayName"])
+    if u.empty?
+      u = User.new
+    else
+      u = u.first
+    end
+
+    u.name = j["creator"]["displayName"]
+    u.email = j["creator"]["email"]
+    u.phone = session[:phone]
+    u.save
+
+    e = Event.where(summary: j["summary"])
+
+    if e.empty?
+      e = Event.new
+    else
+      e = e.first
+    end
+
+    e.summary = j["summary"]
+    e.time = j["start"]["dateTime"]
+    e.user_id = u.id
+    e.save
+      #output += "#{e.id} : #{u.name} : #{u.email} : #{u.phone} : #{e.summary} : #{e.time} "
+  end
+  #output
+  erb :index2
 end
 
 get '/' do
   erb :index
 end
 
-get '/test' do
+get '/unsubscribe' do
+  erb :index3
+end
+
+get '/killeverything' do
+  u = User.where(phone: params[:phone])
+  unless u.empty?
+    u = u.first
+    Event.where(user_id: u.id).delete_all
+    u.delete
+  end
   erb :index
 end
 
-post '/test' do
-  @x = params[:data]
-  erb :index2
-end
 
-get '/test2' do
-  erb :index2
+scheduler = Rufus::Scheduler.new
+if ARGV[0] == "peon"
+  #scheduler.cron '0 06 * * 0-6' do
+  # every day of the week at 22:00 (10pm)
+  scheduler.every '60m' do
+    puts "Sendinggggg"
+    account_sid = 'AC307071b7b6333dab0e0d7a00eeb4f939'
+    auth_token = '1cfd37373215d5386d980c306e1805d9'
+
+    @client = Twilio::REST::Client.new account_sid, auth_token
+
+    Event.where(time: 5.hours.from_now..6.hours.from_now).each do |event|
+      user = User.find(event.user_id)
+      puts "#{user.name} : #{user.phone}"
+      message = @client.account.messages.create(:body => "Hey sweetie! Have fun at your #{event.summary}!",
+        :to => "+1#{user.phone}",
+        :from => "+12486483034")
+      puts message.to
+
+    end
+  end
 end
