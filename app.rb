@@ -72,6 +72,11 @@ end
 get '/oauth2authorize' do
   # Request authorization
   session[:phone] = params[:phone]
+  if params["my-checkbox".to_sym] == 'on'
+    session[:sex] = 'boy'
+  else
+    session[:sex] = 'girl'
+  end
   redirect user_credentials.authorization_uri.to_s, 303
 end
 
@@ -100,7 +105,7 @@ get '/results' do
     else
       u = u.first
     end
-
+    u.sex = session[:sex]
     u.name = j["creator"]["displayName"]
     u.email = j["creator"]["email"]
     u.phone = session[:phone]
@@ -147,21 +152,26 @@ scheduler = Rufus::Scheduler.new
 if ARGV[0] == "peon"
   #scheduler.cron '0 06 * * 0-6' do
   # every day of the week at 22:00 (10pm)
-  scheduler.every '60m' do
-    puts "Sendinggggg"
+  scheduler.every '1m' do
     account_sid = 'AC307071b7b6333dab0e0d7a00eeb4f939'
     auth_token = '1cfd37373215d5386d980c306e1805d9'
 
     @client = Twilio::REST::Client.new account_sid, auth_token
 
-    Event.where(time: 5.hours.from_now..6.hours.from_now).each do |event|
+    Event.where(time: 6.hours.from_now..7.hours.from_now).each do |event|
       user = User.find(event.user_id)
       puts "#{user.name} : #{user.phone}"
-      message = @client.account.messages.create(:body => "Hey sweetie! Have fun at your #{event.summary}!",
+      if user.sex == 'boy'
+        message = @client.account.messages.create(:body => "Hey #{[:boo, :gorgeous, :captain, :sweetie, :honey, :baby, :sweetheart, :cutie, :handsome, :darling].sample}, have fun at your #{event.summary}!",
         :to => "+1#{user.phone}",
         :from => "+12486483034")
-      puts message.to
-
+        puts message.to
+      else
+        message = @client.account.messages.create(:body => "Hey #{[:beautiful, :gorgeous, :sweetie, :honey, :baby, :sweetheart, :cutie, :sunshine, :cookie, :sugarpie, :darling, :lovely, :angel].sample}, have fun at your #{event.summary}!",
+        :to => "+1#{user.phone}",
+        :from => "+12486483034")
+        puts message.to
+      end
     end
   end
 end
