@@ -162,12 +162,12 @@ if ARGV[0] == "peon"
       user = User.find(event.user_id)
       puts "#{user.name} : #{user.phone}"
       if user.sex == 'boy'
-        message = @client.account.messages.create(:body => "Hey #{[:boo, :gorgeous, :captain, :sweetie, :honey, :baby, :sweetheart, :cutie, :handsome, :darling].sample}, have fun at your #{event.summary}!",
+        message = @client.account.messages.create(:body => "Hey #{[:boo, :gorgeous, :captain, :sweetie, :honey, :baby, :sweetheart, :cutie, :handsome, :darling].sample}, have fun at your #{event.summary} today!",
         :to => "+1#{user.phone}",
         :from => "+12486483034")
         puts message.to
       else
-        message = @client.account.messages.create(:body => "Hey #{[:beautiful, :gorgeous, :sweetie, :honey, :baby, :sweetheart, :cutie, :sunshine, :cookie, :sugarpie, :darling, :lovely, :angel].sample}, have fun at your #{event.summary}!",
+        message = @client.account.messages.create(:body => "Hey #{[:beautiful, :gorgeous, :sweetie, :honey, :baby, :sweetheart, :cutie, :sunshine, :cookie, :sugarpie, :darling, :lovely, :angel].sample}, have fun at your #{event.summary} today!",
         :to => "+1#{user.phone}",
         :from => "+12486483034")
         puts message.to
